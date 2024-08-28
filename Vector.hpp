@@ -1,27 +1,45 @@
 #pragma once
+#include "Container.hpp"
 template<typename ElementType>
-class Vector: public Obolochka<size_t, ElementType>
+class Vector: public Container<size_t, ElementType>
 {
 private:
     ElementType* values;
     size_t size;
-public:
-    size_t get_size() {return size+1;};
-    Vector() {size = 0; values = new ElementType[0];}
-    size_t GETPP(size_t index) override
+    size_t capacity;
+    size_t GetElementToPushOfIndex(size_t index) override
     {
         return index;
     };
-    ElementType GIE(size_t index) override
+public:
+    Vector(Vector&) = delete;
+
+    size_t get_size() {return size+1;};
+    Vector() {size = 0; capacity = 0; values = new ElementType[0];}
+
+    ElementType GetElementOfIndex(size_t index) override
     {
         return values[index];
     }
+    void reserve(size_t capacity)
+    {
+        this->capacity = capacity;
+        ElementType* new_values;
+        new_values = new ElementType[capacity];
+        for (int i = 0; i<size; i++)
+        {
+            new_values[i] = values[i];
+        }
+        delete[] values;
+        values = new_values;
+    };
     void child_insert(size_t index, ElementType element)
     {
         ElementType* new_values;
-        if (values[size]!=((size_t)-1))
+        if (capacity<=size)
         {
-            new_values = new ElementType[size+2];
+            capacity = (size+1)*2;
+            new_values = new ElementType[capacity];
             int plus_new_index = 0;
             for (int i = 0; i<=size; i++)
             {
@@ -57,7 +75,7 @@ public:
     }
     virtual ElementType child_erase(size_t index)
     {
-        ElementType element = GIE(index);
+        ElementType element = GetElementOfIndex(index);
         ElementType* new_values = new ElementType[size-1];
         int minas_new_index = 0;
         for (int i = 0; i<size; i++)
@@ -73,5 +91,5 @@ public:
         values = new_values;
         size--;
         return element;
-    }
+    };
 };

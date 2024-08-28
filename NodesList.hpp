@@ -1,5 +1,5 @@
 #pragma once
-#include "Obolochka.hpp"
+#include "Container.hpp"
 
 
 
@@ -37,28 +37,14 @@ public:
 };
 
 template<typename ElementType>
-class NodesList :public Obolochka<Node<ElementType>*, ElementType>
+class NodesList :public Container<Node<ElementType>*, ElementType>
 {
     Node<ElementType>* last;
     Node<ElementType>* first;
     size_t size;
 private:
 
-    NodesList(NodesList&& rv)
-    {
-        this->last = rv->last;
-        this->first = rv->first;
-        Node<ElementType>* first_rv = rv->first;
-        Node<ElementType>* two;
-        ElementType el;
-        for (size_t i = 0; i < rv->size; i++)
-        {
-            first_rv->data = el;
-            two = first_rv->next;
-            first_rv->next = nullptr;
-            first_rv = two;
-        }
-    }
+
     Iterator<ElementType>begin()
     {
         Iterator<ElementType>it{first};
@@ -90,7 +76,7 @@ private:
         size--;
         return element;
     }
-    Node<ElementType>* GETPP(size_t index) override
+    Node<ElementType>* GetElementToPushOfIndex(size_t index) override
     {
         Node<ElementType>* return_element;
         size_t sredni_index = size / 2;
@@ -113,6 +99,45 @@ private:
         return return_element;
     }
 public:
+    NodesList(NodesList&& rv)
+    {
+        this->last = rv->last;
+        this->first = rv->first;
+        Node<ElementType>* first_rv = rv->first;
+        Node<ElementType>* two;
+        ElementType el;
+        for (size_t i = 0; i < rv->size; i++)
+        {
+            first_rv->data = el;
+            two = first_rv->next;
+            first_rv->next = nullptr;
+            first_rv = two;
+        }
+    }
+    NodesList(NodesList& nd)
+    {
+        Nodes<ElementType>* element = last;
+        Nodes<ElementType>* element2 = nd->last;
+        for (int i = 0; i < size; i++)
+        {
+            element->data = element2->data;
+            element = element->prev;
+            element2 = element2->prev;
+        }       
+    }
+
+    ~NodesList()
+    {
+        Node<ElementType>* element2;
+        for (int i = 0; i<size; i++)
+        {
+            element2 = last->prev;
+            delete last;
+            last = element2;
+        }
+        delete element2;
+        
+    }
     size_t get_size() override {
         return size;
     }
@@ -123,8 +148,8 @@ public:
         first->next = last;
         last->prev = first;
     }
-    ElementType GIE(size_t index) override
+    ElementType GetElementOfIndex(size_t index) override
     {
-        return GETPP(index+1)->data;
+        return GetElementToPushOfIndex(index+1)->data;
     }
 };
