@@ -20,7 +20,7 @@ void ConteinerTest(Conteiner nd)
 
 int main()
 {
-    NodesList<int> nd;
-    Vector<int> vc;
-    ConteinerTest(vc);
+    Vector v;
+    v.push_back(1);
+    std::cout << v[0];
 }

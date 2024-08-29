@@ -1,6 +1,6 @@
 #pragma once
 #include "Container.hpp"
-template<typename ElementType>
+template<typename ElementType=int>
 class Vector: public Container<size_t, ElementType>
 {
 private:
@@ -12,7 +12,16 @@ private:
         return index;
     };
 public:
-    Vector(Vector&) = delete;
+    Vector(const Vector& vc)
+    {
+        values = new ElementType[vc.size];
+        size = vc.size;
+        capacity = size;
+        for (int i = 0; i<size; i++)
+        {
+            values[i] = vc.values[i];
+        }
+    }
 
     size_t get_size() {return size+1;};
     Vector() {size = 0; capacity = 0; values = new ElementType[0];}
@@ -73,6 +82,12 @@ public:
 
         size++;
     }
+
+    ~Vector()
+    {
+        delete[] values;
+    }
+
     virtual ElementType child_erase(size_t index)
     {
         ElementType element = GetElementOfIndex(index);

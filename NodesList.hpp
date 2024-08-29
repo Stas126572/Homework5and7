@@ -36,7 +36,7 @@ public:
     }
 };
 
-template<typename ElementType>
+template<typename ElementType=int>
 class NodesList :public Container<Node<ElementType>*, ElementType>
 {
     Node<ElementType>* last;
@@ -83,7 +83,7 @@ private:
         if (index > sredni_index)
         {
             return_element = last;
-            for (int i = size; i!=index; i--)
+            for (size_t i = size; i!=index; i--)
             {
                 return_element = return_element->prev;
             }
@@ -99,7 +99,7 @@ private:
         return return_element;
     }
 public:
-    NodesList(NodesList&& rv)
+    NodesList(NodesList<ElementType>&& rv)
     {
         this->last = rv->last;
         this->first = rv->first;
@@ -114,16 +114,19 @@ public:
             first_rv = two;
         }
     }
-    NodesList(NodesList& nd)
+    NodesList(const NodesList<ElementType>& nd)
     {
-        Nodes<ElementType>* element = last;
-        Nodes<ElementType>* element2 = nd->last;
-        for (int i = 0; i < size; i++)
+        Node<ElementType>*el = nd.first;
+        first = new Node<ElementType>{};
+        last = new Node<ElementType>{};
+        first->next = last;
+        last->prev = first;
+        size = nd.size;
+        for (int i = 0; i<nd.size-1; i++)
         {
-            element->data = element2->data;
-            element = element->prev;
-            element2 = element2->prev;
-        }       
+            el = el->next;
+            child_insert(last->prev, el->data);
+        }
     }
 
     ~NodesList()
@@ -136,7 +139,7 @@ public:
             last = element2;
         }
         delete element2;
-        
+ 
     }
     size_t get_size() override {
         return size;
